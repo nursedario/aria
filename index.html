@@ -10,40 +10,40 @@
 <meta name="apple-mobile-web-app-title" content="Aria">
 <meta name="application-name" content="Aria">
 <meta name="description" content="English in Fragments: speaking and writing reps toward a real C1.">
-<meta name="theme-color" content="#F5F6F8" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#0F1115" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#F2F7FB" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#071725" media="(prefers-color-scheme: dark)">
 <link rel="manifest" href="manifest.webmanifest?v=20261126b">
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png?v=20261126b">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png?v=20261126b">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261126b">
 <link rel="shortcut icon" href="favicon.ico?v=20261126b">
+<meta name="aria-layout" content="ocean-bottom-tabs-v1">
 <title>Aria · English in Fragments</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;1,6..72,400&display=swap">
 <style>
-/* Layout: one 760px phrasebook column under a sticky tab bar. Each room opens with one line in the spoken voice (serif), then lists you open one at a time.
-   Ballpoint blue = anything you press. Highlighter = the part you practice. */
+/* Aria: ocean-blue practice rooms with a fixed bottom dock. */
 :root{
-  --paper:#F5F6F8; --sheet:#FFFFFF; --ink:#13161D; --ink-2:#4B5262; --ink-3:#848A99; --rule:#E1E4EA;
-  --pen:#2742C7; --pen-wash:#E8ECFA; --on-pen:#FFFFFF;
-  --mark-bg:#FFE45C; --mark-fg:#13161D; --done:#1C7F53;
+  --paper:#F2F7FB; --sheet:#FFFFFF; --ink:#11283A; --ink-2:#3D566B; --ink-3:#526C80; --rule:#CBDCE9; --dock:#F4F9FC;
+  --pen:#075C86; --pen-wash:#DBEEF7; --on-pen:#FFFFFF;
+  --mark-bg:#CCEAF1; --mark-fg:#134A61; --done:#19714F;
   --font-voice:"Newsreader", Georgia, "Times New Roman", serif;
   --font-ui:"Geist", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --font-mono:"Geist Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
-  --r:10px;
+  --r:16px;
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
-    --paper:#0F1115; --sheet:#171A20; --ink:#ECEEF2; --ink-2:#AFB5C2; --ink-3:#7A8191; --rule:#262A33;
-    --pen:#93A5FF; --pen-wash:#1D2340; --on-pen:#0F1115;
-    --mark-bg:rgba(242,213,77,.26); --mark-fg:#F6E07A; --done:#4CC08A; color-scheme:dark;
+    --paper:#071725; --sheet:#10283A; --ink:#EAF7FC; --ink-2:#AFCAD9; --ink-3:#92ADBF; --rule:#2B4659; --dock:#0B2131;
+    --pen:#79D2F5; --pen-wash:#17394D; --on-pen:#071725;
+    --mark-bg:#214856; --mark-fg:#BBEBF4; --done:#70D9A9; color-scheme:dark;
   }
 }
 :root[data-theme="dark"]{
-  --paper:#0F1115; --sheet:#171A20; --ink:#ECEEF2; --ink-2:#AFB5C2; --ink-3:#7A8191; --rule:#262A33;
-  --pen:#93A5FF; --pen-wash:#1D2340; --on-pen:#0F1115;
-  --mark-bg:rgba(242,213,77,.26); --mark-fg:#F6E07A; --done:#4CC08A; color-scheme:dark;
+  --paper:#071725; --sheet:#10283A; --ink:#EAF7FC; --ink-2:#AFCAD9; --ink-3:#92ADBF; --rule:#2B4659; --dock:#0B2131;
+  --pen:#79D2F5; --pen-wash:#17394D; --on-pen:#071725;
+  --mark-bg:#214856; --mark-fg:#BBEBF4; --done:#70D9A9; color-scheme:dark;
 }
 :root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 [hidden]{display:none!important}
@@ -56,22 +56,32 @@ button{font:inherit;color:inherit}
 :focus-visible{outline:2px solid var(--pen);outline-offset:2px;border-radius:4px}
 p{margin:0}
 
-/* ---------- header ---------- */
-.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--paper);background:color-mix(in srgb,var(--paper) 90%,transparent);-webkit-backdrop-filter:saturate(1.3) blur(12px);backdrop-filter:saturate(1.3) blur(12px);border-bottom:1px solid var(--rule)}
-.top-in{max-width:760px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:12px 0}
-.brand{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
-.wordmark{font-family:var(--font-voice);font-size:20px;line-height:1.2;text-decoration:none;letter-spacing:-.01em}
-.wordmark em{color:var(--ink-2)}
-.status{font-family:var(--font-mono);font-size:10.5px;color:var(--ink-3);letter-spacing:.08em;text-transform:uppercase;white-space:nowrap}
-.tabs{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;margin:6px -8px 0;padding:0 8px 8px;-webkit-mask-image:linear-gradient(90deg,transparent 0,black 10px,black calc(100% - 28px),transparent);mask-image:linear-gradient(90deg,transparent 0,black 10px,black calc(100% - 28px),transparent)}
-.tabs::-webkit-scrollbar{display:none}
-.tabs a{flex:none;text-decoration:none;color:var(--ink-2);font-size:14.5px;font-weight:500;padding:5px 9px;background-image:linear-gradient(var(--mark-bg),var(--mark-bg));background-repeat:no-repeat;background-position:0 72%;background-size:0 60%;transition:background-size .35s cubic-bezier(.2,.7,.2,1),color .2s}
-.tabs a:hover{color:var(--ink)}
-.tabs a[aria-current="page"]{color:var(--mark-fg);background-size:100% 60%}
-
+/* ---------- app header and dock ---------- */
+.top-in{max-width:760px;margin:0 auto;padding:21px max(16px,env(safe-area-inset-right,0px)) 0 max(16px,env(safe-area-inset-left,0px))}
+.brand{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;padding:0 0 15px;border-bottom:1px solid var(--rule)}
+.brand-name{display:flex;flex-direction:column;gap:3px}
+.wordmark{font-size:34px;font-weight:650;line-height:1;letter-spacing:-.055em;text-decoration:none}
+.brand-sub{font-size:12px;color:var(--ink-2)}
+.status{font-family:var(--font-mono);font-size:10px;color:var(--ink-3);letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;padding-bottom:2px}
+.dock{position:fixed;inset:auto 0 0;z-index:12;background:var(--dock);border-top:1px solid var(--rule);
+ padding:4px max(3px,env(safe-area-inset-right,0px)) calc(4px + env(safe-area-inset-bottom,0px)) max(3px,env(safe-area-inset-left,0px))}
+.tabs{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));max-width:760px;margin:auto}
+.tabs a{display:flex;min-width:0;min-height:52px;align-items:center;justify-content:center;flex-direction:column;gap:3px;border-radius:12px;padding:4px 0;
+ color:var(--ink-3);text-decoration:none;font-weight:600;font-size:clamp(9px,2.36vw,11px);line-height:1.14;white-space:nowrap}
+.tabs a .nav-icon{display:grid;place-items:center;width:30px;height:25px;border-radius:9px}
+.tabs a svg{width:19px;height:19px;display:block;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.tabs a[aria-current="page"],.tabs a:hover{color:var(--pen)}
+.tabs a[aria-current="page"] .nav-icon{background:var(--pen-wash)}
+.tabs a:focus-visible{outline-offset:-2px}
+#room-today{gap:clamp(25px,5vw,36px)}
+#room-today .hero{gap:8px}
+#room-today .home-day{font-family:var(--font-ui);font-size:25px;font-weight:600;line-height:1.18;letter-spacing:-.034em;margin:0}
+#room-today .today-note{font-size:12.5px;color:var(--ink-3)}
+#room-today .topic-line{font-size:14px;margin-top:2px}
+#room-today .session{border-radius:18px}
 /* ---------- page ---------- */
 .wrap{max-width:760px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
-main.wrap{padding-block:32px 56px}
+main.wrap{padding-block:24px 40px}
 .room{display:flex;flex-direction:column;gap:44px}
 .room-head,.hero{display:flex;flex-direction:column;gap:12px}
 .eyebrow,.lbl{font-family:var(--font-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);font-weight:400}
@@ -90,7 +100,7 @@ main.wrap{padding-block:32px 56px}
 .sheet{background:var(--sheet);border:1px solid var(--rule);border-radius:var(--r);padding:20px}
 .split{display:grid;grid-template-columns:1fr 1fr;gap:28px}
 @media (max-width:720px){.split{grid-template-columns:1fr;gap:40px}}
-[id]{scroll-margin-top:120px}
+[id]{scroll-margin-top:calc(18px + env(safe-area-inset-top,0px))}
 
 /* highlighter + blanks */
 mark{color:var(--mark-fg);background-color:transparent;background-image:linear-gradient(var(--mark-bg),var(--mark-bg));background-repeat:no-repeat;background-position:0 72%;background-size:100% 68%;padding:0 .06em;border-radius:2px;-webkit-box-decoration-break:clone;box-decoration-break:clone}
@@ -363,12 +373,12 @@ select.field-in{appearance:auto}
 .longshort .s{font-family:var(--font-voice);font-size:24px}
 
 /* footer + toast */
-.foot{padding-block:28px 40px;border-top:1px solid var(--rule);color:var(--ink-3);font-size:13px;display:flex;flex-direction:column;gap:6px}
-.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translate(-50%,12px);background:var(--ink);color:var(--paper);padding:10px 16px;border-radius:999px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;max-width:calc(100% - 32px);text-align:center;z-index:20}
+.foot{padding-block:24px calc(85px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--rule);color:var(--ink-3);font-size:13px;display:flex;flex-direction:column;gap:6px}
+.toast{position:fixed;left:50%;bottom:calc(66px + env(safe-area-inset-bottom,0px));transform:translate(-50%,12px);background:var(--ink);color:var(--paper);padding:10px 16px;border-radius:999px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;max-width:calc(100% - 32px);text-align:center;z-index:20}
 .toast.show{opacity:1;transform:translate(-50%,0)}
 
 @media (max-width:560px){
-  main.wrap{padding-block:24px 48px}
+  main.wrap{padding-block:20px 34px}
   .room{gap:38px}
   .sheet{padding:16px}
   .ttl{font-size:18.5px}
@@ -380,19 +390,9 @@ select.field-in{appearance:auto}
 <header class="top">
   <div class="top-in">
     <div class="brand">
-      <a class="wordmark" href="#today">English <em>in Fragments</em></a>
+      <div class="brand-name"><a class="wordmark" href="#today" aria-label="Aria home">Aria</a><p class="brand-sub">English in Fragments</p></div>
       <span class="status" id="status">Loading</span>
     </div>
-    <nav class="tabs" id="tabs" aria-label="Rooms">
-      <a href="#today" data-room="today">Today</a>
-      <a href="#retry" data-room="retry">Retry</a>
-      <a href="#fillers" data-room="fillers">Fillers</a>
-      <a href="#talk" data-room="talk">Talk</a>
-      <a href="#explain" data-room="explain">Explain</a>
-      <a href="#story" data-room="story">Story</a>
-      <a href="#shadow" data-room="shadow">Shadow</a>
-      <a href="#write" data-room="write">Write</a>
-    </nav>
   </div>
 </header>
 
@@ -411,6 +411,16 @@ select.field-in{appearance:auto}
   <p>Quotes are verbatim from your NotebookLM sources (Naval Ravikant, Marco Rubio and their hosts). Grey notes under a quote mark transcript fixes.</p>
   <p>Lines labeled “Your version” are not from the sources. Progress and retry phrases are saved on each device you use.</p>
 </footer>
+<div class="dock"><nav class="tabs" id="tabs" aria-label="Practice rooms">
+    <a href="#today" data-room="today"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="3"/><path d="M8 3v4m8-4v4M4 10h16m-12 5h3"/></svg></span><span>Today</span></a>
+    <a href="#retry" data-room="retry"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11a8 8 0 1 1 2 6m-2-6V5m0 6h6"/></svg></span><span>Retry</span></a>
+    <a href="#fillers" data-room="fillers"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h6m4 0h6M4 18h16"/><path d="M10 12h4" stroke-dasharray="1 2"/></svg></span><span>Fillers</span></a>
+    <a href="#talk" data-room="talk"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11.5a7.5 7.5 0 0 1-11.3 6.4L4 19l1.1-4.5A7.5 7.5 0 1 1 20 11.5Z"/><path d="M8.5 11.5h7"/></svg></span><span>Talk</span></a>
+    <a href="#explain" data-room="explain"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l2.5 2"/></svg></span><span>Explain</span></a>
+    <a href="#story" data-room="story"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6c-2.6-2-5.2-2.6-8-1.5v14c2.8-1 5.4-.4 8 1.5 2.6-1.9 5.2-2.5 8-1.5v-14c-2.8-1.1-5.4-.5-8 1.5Zm0 0v14"/></svg></span><span>Story</span></a>
+    <a href="#shadow" data-room="shadow"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10v4m4-7v10m5-13v16m5-13v10m4-7v4"/></svg></span><span>Shadow</span></a>
+    <a href="#write" data-room="write"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 15-1 5 5-1L20 8l-4-4L5 15Zm8-8 4 4"/></svg></span><span>Write</span></a>
+</nav></div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
@@ -794,8 +804,9 @@ function roomToday(){
   return `
   <div class="hero">
     <p class="eyebrow" id="todayDate">Today</p>
-    <h1 class="thesis xl"><span class="ph">Finish one sentence.</span> <span class="ph"><span class="br" aria-hidden="true">‖</span>Stop.</span> <span class="ph"><span class="br" aria-hidden="true">‖</span>Start the next.</span></h1>
+    <h1 class="home-day">Today’s practice</h1>
     <p class="topic-line" id="topicLine"><span class="lbl">Today’s topic</span><span class="muted">Loading…</span></p>
+    <p class="today-note">Finish one sentence. Stop. Start the next.</p>
   </div>
   <section class="sheet session" aria-labelledby="sessH">
     <div class="sheet-head"><h2 class="h3" id="sessH">Today’s session</h2><span class="mono muted" id="stepCount">0 / 5</span></div>
@@ -1311,7 +1322,7 @@ function currentRoom(){const r=(location.hash||'').slice(1);return ROOMS.include
 function route(){
   const r=currentRoom();
   ROOMS.forEach(k=>{$('#room-'+k).hidden=k!==r});
-  $$('#tabs a').forEach(a=>{if(a.dataset.room===r){a.setAttribute('aria-current','page');const nav=$('#tabs');const left=a.offsetLeft-nav.clientWidth/2+a.offsetWidth/2;nav.scrollTo({left:Math.max(0,left),behavior:lastRoom?'smooth':'auto'})}else a.removeAttribute('aria-current')});
+  $$('#tabs a').forEach(a=>{if(a.dataset.room===r)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current')});
   if(lastRoom&&lastRoom!==r&&Voice.btn)stopVoice();
   const target=pendingScroll&&document.getElementById(pendingScroll);pendingScroll=null;
   if(target){requestAnimationFrame(()=>target.scrollIntoView({behavior:'smooth',block:'start'}))}
