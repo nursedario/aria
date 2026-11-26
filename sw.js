@@ -1,5 +1,5 @@
 // Offline support: the page itself is network-first (so updates arrive), everything else cache-first.
-const CACHE = 'fragments-20261126-ocean';
+const CACHE = 'fragments-20261126-compact';
 const CORE = ['./', './index.html', './manifest.webmanifest', './apple-touch-icon.png', './icon-192.png'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(CORE)));

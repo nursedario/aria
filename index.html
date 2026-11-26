@@ -17,7 +17,7 @@
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png?v=20261126b">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261126b">
 <link rel="shortcut icon" href="favicon.ico?v=20261126b">
-<meta name="aria-layout" content="ocean-bottom-tabs-v1">
+<meta name="aria-layout" content="ocean-practice-dock-v2">
 <title>Aria · English in Fragments</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -65,7 +65,7 @@ p{margin:0}
 .status{font-family:var(--font-mono);font-size:10px;color:var(--ink-3);letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;padding-bottom:2px}
 .dock{position:fixed;inset:auto 0 0;z-index:12;background:var(--dock);border-top:1px solid var(--rule);
  padding:4px max(3px,env(safe-area-inset-right,0px)) calc(4px + env(safe-area-inset-bottom,0px)) max(3px,env(safe-area-inset-left,0px))}
-.tabs{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));max-width:760px;margin:auto}
+.tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));max-width:760px;margin:auto}
 .tabs a{display:flex;min-width:0;min-height:52px;align-items:center;justify-content:center;flex-direction:column;gap:3px;border-radius:12px;padding:4px 0;
  color:var(--ink-3);text-decoration:none;font-weight:600;font-size:clamp(9px,2.36vw,11px);line-height:1.14;white-space:nowrap}
 .tabs a .nav-icon{display:grid;place-items:center;width:30px;height:25px;border-radius:9px}
@@ -384,6 +384,45 @@ select.field-in{appearance:auto}
   .ttl{font-size:18.5px}
 }
 @media (prefers-reduced-motion: reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+
+/* Compact practice: a quiet action, rooms in groups, and details on demand. */
+.tabs a{font-size:11px}
+main.wrap .room{gap:clamp(20px,5vw,33px)}
+#room-today{gap:17px}
+#room-today .hero{gap:5px}
+.room-title{margin:0;font-size:30px;line-height:1.16;letter-spacing:-.04em}
+.next-practice{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:14px;border:1px solid var(--rule);background:var(--sheet);border-radius:19px;padding:16px}
+.next-practice h2{margin:2px 0 0;font-size:21px;line-height:1.2;letter-spacing:-.025em}
+.next-practice .hint{margin-top:3px;color:var(--ink-2)}
+.next-practice .btn svg{width:14px;height:14px}
+#room-today .session{padding-block:12px}
+#room-today .step{padding:6px 0;min-height:43px;gap:9px}
+#room-today .step .check{width:25px;height:25px}
+#room-today .step .go{font-size:12.5px}
+.shelves{display:grid;grid-template-columns:minmax(0,1fr);gap:8px}
+.shelf{border:1px solid var(--rule);border-radius:13px;background:var(--sheet)}
+.shelf > summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:10px;padding:11px 13px}
+.shelf > summary::-webkit-details-marker{display:none}
+.shelf > summary span:first-child{min-width:0;display:grid;gap:1px}
+.shelf > summary small{font-size:12.5px;color:var(--ink-2)}
+.shelf-arrow{display:grid;place-items:center;width:22px;height:22px;flex:none;color:var(--pen);font-size:19px;line-height:1;transition:transform .2s}
+.shelf[open] > summary .shelf-arrow{transform:rotate(45deg)}
+.shelf-content{padding:12px;border-top:1px solid var(--rule);min-width:0}
+.shelf-content .target{padding:10px}
+.quiet-motto{font-size:12.5px;text-align:center;color:var(--ink-3)}
+.guide-steps{margin:0;padding-inline-start:20px;color:var(--ink-2)}
+.guide-steps li+li{padding-top:5px}
+.speak-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.speak-card{display:grid;align-content:start;gap:5px;padding:15px;border:1px solid var(--rule);border-radius:16px;background:var(--sheet);text-decoration:none;min-height:115px}
+.speak-card small{color:var(--ink-2);line-height:1.35}
+.speak-card svg{stroke:var(--pen);fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.speak-card:hover{border-color:var(--pen)}
+.speak-back:not([hidden]){display:inline-flex;margin-bottom:17px}
+.shadow-sets{display:grid;grid-template-columns:repeat(auto-fit,minmax(76px,1fr));gap:5px}
+.shadow-sets .chip{min-height:36px}
+.shadow-sets .chip[aria-pressed="true"]{background:var(--pen-wash);border-color:var(--pen);color:var(--pen)}
+@media(max-width:380px){.next-practice{gap:8px;padding:12px}.next-practice .btn{padding-inline:10px}.next-practice .btn,.next-practice .hint{font-size:12px}}
+
 </style>
 </head>
 <body>
@@ -398,6 +437,8 @@ select.field-in{appearance:auto}
 
 <main class="wrap" id="main">
   <section class="room" id="room-today" data-room="today"></section>
+  <a class="go speak-back" href="#speak" id="speakBack" hidden>← Speak</a>
+  <section class="room" id="room-speak" data-room="speak" hidden></section>
   <section class="room" id="room-retry" data-room="retry" hidden></section>
   <section class="room" id="room-fillers" data-room="fillers" hidden></section>
   <section class="room" id="room-talk" data-room="talk" hidden></section>
@@ -413,11 +454,7 @@ select.field-in{appearance:auto}
 </footer>
 <div class="dock"><nav class="tabs" id="tabs" aria-label="Practice rooms">
     <a href="#today" data-room="today"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="3"/><path d="M8 3v4m8-4v4M4 10h16m-12 5h3"/></svg></span><span>Today</span></a>
-    <a href="#retry" data-room="retry"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11a8 8 0 1 1 2 6m-2-6V5m0 6h6"/></svg></span><span>Retry</span></a>
-    <a href="#fillers" data-room="fillers"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h6m4 0h6M4 18h16"/><path d="M10 12h4" stroke-dasharray="1 2"/></svg></span><span>Fillers</span></a>
-    <a href="#talk" data-room="talk"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11.5a7.5 7.5 0 0 1-11.3 6.4L4 19l1.1-4.5A7.5 7.5 0 1 1 20 11.5Z"/><path d="M8.5 11.5h7"/></svg></span><span>Talk</span></a>
-    <a href="#explain" data-room="explain"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l2.5 2"/></svg></span><span>Explain</span></a>
-    <a href="#story" data-room="story"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6c-2.6-2-5.2-2.6-8-1.5v14c2.8-1 5.4-.4 8 1.5 2.6-1.9 5.2-2.5 8-1.5v-14c-2.8-1.1-5.4-.5-8 1.5Zm0 0v14"/></svg></span><span>Story</span></a>
+    <a href="#speak" data-room="speak"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21m-3 0h6"/></svg></span><span>Speak</span></a>
     <a href="#shadow" data-room="shadow"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10v4m4-7v10m5-13v16m5-13v10m4-7v4"/></svg></span><span>Shadow</span></a>
     <a href="#write" data-room="write"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 15-1 5 5-1L20 8l-4-4L5 15Zm8-8 4 4"/></svg></span><span>Write</span></a>
 </nav></div>
@@ -800,29 +837,49 @@ function trioHTML(p){
 }
 
 /* ================= rooms ================= */
+function shelf(title,preview,body){
+  return `<details class="shelf"><summary><span><b>${esc(title)}</b><small>${esc(preview)}</small></span><span class="shelf-arrow" aria-hidden="true">+</span></summary><div class="shelf-content">${body}</div></details>`;
+}
+function roomSpeak(){
+  const cards=[
+    ['talk','Talk','Practice a real conversation.','<path d="M20 11.5a7.5 7.5 0 0 1-11.3 6.4L4 19l1.1-4.5A7.5 7.5 0 1 1 20 11.5Z"/><path d="M8.5 11.5h7"/>'],
+    ['fillers','Fillers','Trade “uh” for a useful phrase.','<path d="M4 6h16M4 12h6m4 0h6M4 18h16"/>'],
+    ['story','Story','Tell what happened in the past tense.','<path d="M12 6c-2.6-2-5.2-2.6-8-1.5v14c2.8-1 5.4-.4 8 1.5 2.6-1.9 5.2-2.5 8-1.5v-14c-2.8-1.1-5.4-.5-8 1.5Zm0 0v14"/>'],
+    ['explain','Explain','Teach one idea in two minutes.','<circle cx="12" cy="12" r="8"/><path d="M12 8v4l2.5 2"/>']
+  ];
+  return `<header class="room-head"><h1 class="room-title">Speak</h1><p class="hint">Pick one kind of practice.</p></header>
+  <div class="speak-grid">${cards.map(([id,title,desc,icon])=>`<a href="#${id}" class="speak-card"><svg width="25" height="25" viewBox="0 0 24 24" aria-hidden="true">${icon}</svg><b>${title}</b><small>${desc}</small></a>`).join('')}</div>
+  <a class="go secondary-link" href="#retry">Retry phrases ${ICON.arrow}</a>`;
+}
 function roomToday(){
   return `
   <div class="hero">
     <p class="eyebrow" id="todayDate">Today</p>
     <h1 class="home-day">Today’s practice</h1>
     <p class="topic-line" id="topicLine"><span class="lbl">Today’s topic</span><span class="muted">Loading…</span></p>
-    <p class="today-note">Finish one sentence. Stop. Start the next.</p>
+
   </div>
+  <section class="next-practice" aria-labelledby="nextName">
+    <div><p class="eyebrow" id="nextLabel">Today’s session</p><h2 id="nextName">Getting ready…</h2><p class="hint" id="nextHint"></p></div>
+    <a class="btn primary" id="nextLink" href="#retry" hidden>Continue ${ICON.arrow}</a>
+  </section>
   <section class="sheet session" aria-labelledby="sessH">
     <div class="sheet-head"><h2 class="h3" id="sessH">Today’s session</h2><span class="mono muted" id="stepCount">0 / 5</span></div>
     <ol class="steps">${SESSION.map((s,i)=>`
       <li class="step" id="step${i}">
         <button class="check" type="button" data-step="${i}" aria-pressed="false" aria-label="Mark ${esc(s.name)} done" disabled>${ICON.check}</button>
-        <div class="step-txt"><span class="step-name"><span class="n">${i+1}</span>${esc(s.name)}</span><span class="step-hint">${esc(s.hint)}</span></div>
+        <div class="step-txt"><span class="step-name"><span class="n">${i+1}</span>${esc(s.name)}</span></div>
         <a class="go" href="#${s.room}"${s.scroll?` data-scroll="${s.scroll}"`:''}>${esc(s.go)}${ICON.arrow}</a>
       </li>`).join('')}
     </ol>
   </section>
-  <div class="split">
+  <div class="shelves" aria-label="Practice resources">
+    ${shelf('Warm-up','Three lines for a real situation.', `
     <section class="block" id="warm" aria-labelledby="warmH">
       <div class="block-head"><h2 class="h3" id="warmH">Warm-up · <span id="warmPlace"></span></h2><button class="btn sm" type="button" id="warmNext">${ICON.shuffle}Another place</button></div>
       <ol class="trio" id="warmTrio"></ol>
-    </section>
+    </section>`)}
+    ${shelf('Weekly progress','20 + 20 and tomorrow’s topic.', `
     <section class="block" aria-labelledby="weekH">
       <div class="block-head"><h2 class="h3" id="weekH">20 + 20</h2><span class="mono muted" id="weekNote"></span></div>
       <div class="week" id="week"></div>
@@ -831,22 +888,26 @@ function roomToday(){
       <div class="field"><label class="lbl" for="planInput">Tonight, plan tomorrow’s topic</label>
       <input class="field-in" id="planInput" type="text" maxlength="140" autocomplete="off" placeholder="Girard and Naval, two minutes" disabled></div>
       <p class="hint">Your best session (UPS) was the one you planned the night before.</p>
-    </section>
-  </div>
+    </section>`)}
+    ${shelf('Grammar target','Third person: he wants, it has.', `
   <section class="target" aria-label="Number one target">
     <p class="eyebrow">Number one target · W1</p>
     <p class="target-line sweep">he want<mark>s</mark><span class="sep">·</span>it ha<mark>s</mark><span class="sep">·</span>my life ha<mark>s</mark></p>
     <p class="muted">It came up in all four sessions: “she want”, “my life have”, “it have to be saved”. And the reverse: “people who wants”. One person or thing gets -s. People, they and we don’t.</p>
     <a class="go" href="#shadow" data-set="s">Shadow 15 lines ${ICON.arrow}</a>
-  </section>
+  </section>`)}
+  ${shelf('The fragments','Your toolkit for small, focused reps.', `
   <section class="block" aria-labelledby="fragH">
     <div class="block-head"><h2 class="h3" id="fragH">The fragments</h2><span class="mono muted">${FRAGS.length} pieces, one at a time</span></div>
     <div class="frags">${FRAGS.map(f=>`<a class="frag" href="#${f[2]}"${f[3]?` data-scroll="${f[3]}"`:''}><span><b>${esc(f[0])}</b><small>${esc(f[1])}</small></span>${ICON.arrow}</a>`).join('')}</div>
-  </section>
+  </section>`)}
+  ${shelf('What’s working','Patterns from five logged sessions.', `
   <section class="block" aria-labelledby="workH">
     <div class="block-head"><h2 class="h3" id="workH">What’s working</h2><span class="mono muted">from five logged sessions</span></div>
     <ul class="working">${WORKING.map(w=>`<li><b>${esc(w[0])}</b>${esc(w[1])}</li>`).join('')}</ul>
-  </section>`;
+  </section>`)}
+  ${shelf('Session guide','What each of the five steps trains.', `<ol class="guide-steps">${SESSION.map(x=>`<li><b>${esc(x.name)}</b> ${esc(x.hint)}</li>`).join('')}</ol>`)}
+  </div><p class="quiet-motto">Finish one sentence. Stop. Start the next.</p>`;
 }
 
 function roomRetry(){
@@ -961,7 +1022,7 @@ function roomShadow(){
   return head('Shadowing · W1 · W4','Hear it. Say it with them. Say it alone.','Repeat a line from a clip with the same intonation. These lines carry the grammar you’re fixing.')+`
   <section class="sheet player" aria-labelledby="plH">
     <div class="block-head"><h2 class="h3" id="plH">Shadow player</h2><span class="mono muted" id="plCount"></span></div>
-    <div class="chips" id="setChips" role="group" aria-label="Grammar target">${SETS.map(s=>`<button class="chip" type="button" data-setk="${s.key}" aria-pressed="false">${esc(s.label)}</button>`).join('')}</div>
+    <div class="shadow-sets" id="setChips" role="group" aria-label="Grammar target">${SETS.map(s=>`<button class="chip" type="button" data-setk="${s.key}" aria-pressed="false">${esc(s.label)}</button>`).join('')}</div>
     <p class="pl-line sweep" id="plLine"></p>
     <div class="pl-foot"><span class="row" style="gap:8px"><span class="pl-who" id="plWho"></span><button class="iconbtn sm" type="button" id="plCopy" aria-label="Copy the line to find the clip" title="Copy the line to find the clip">${ICON.copy}</button></span><span class="reps" role="group" aria-label="Times you said it" id="reps">${[0,1,2].map(i=>`<button class="rep" type="button" data-rep="${i}" aria-pressed="false" aria-label="Said it ${i+1} time${i?'s':''}"></button>`).join('')}<span class="mono muted">×3</span></span></div>
     <div class="pl-controls">
@@ -973,23 +1034,29 @@ function roomShadow(){
     </div>
     <p class="hint" id="plNote"></p>
   </section>
+  <div class="shelves">
+  ${shelf('How to shadow with clips','Find it, listen, speak with them, then say it alone.', `
   <section class="block">
     <div class="block-head"><h2 class="h3">How to shadow with clips</h2><span class="mono muted">from your April plan</span></div>
     <ol class="howto"><li><span class="k">01</span><b>Find the line</b><span>Copy it, search it in NotebookLM, open the clip.</span></li><li><span class="k">02</span><b>Listen once</b><span>Only listen. Notice where the voice goes up and down.</span></li><li><span class="k">03</span><b>Say it with them</b><span>Same speed, same melody, at the same time.</span></li><li><span class="k">04</span><b>Say it alone</b><span>Three times. Tap a dot each time.</span></li></ol>
     <p class="hint">The voice button is a stand-in for practice anywhere. The real clip has the real intonation.</p>
-  </section>
-  <div class="rulecard"><div><span class="lbl">One person or thing → -s</span><p>Everybody want<mark>s</mark>. The world reflect<mark>s</mark>. My life ha<mark>s</mark>.</p></div><div><span class="lbl">Many → no -s</span><p>People want. They have. We need.</p></div></div>
+  </section>`)}
+  ${shelf('Grammar reference','One person or thing takes -s. Many do not.', `
+  <div class="rulecard"><div><span class="lbl">One person or thing → -s</span><p>Everybody want<mark>s</mark>. The world reflect<mark>s</mark>. My life ha<mark>s</mark>.</p></div><div><span class="lbl">Many → no -s</span><p>People want. They have. We need.</p></div></div>`)}
+  ${shelf('Who to shadow','Naval for conversation. Rubio for stories and rhythm.', `
   <section class="block">
     <div class="block-head"><h2 class="h3">Who to shadow for what</h2></div>
     <div class="two">
       <div class="who-card"><b>Naval · unscripted podcasts</b><p>Your model for conversation. Explanations from one claim, short lines with weight, and how he keeps talking while he thinks without “uh”.</p></div>
       <div class="who-card"><b>Rubio · speeches and top moments</b><p>Your model for stories, past tense and writing: the family story, “not X, but Y”, a short line right after a long one.</p><p class="warn">Not for small talk. At the gym it sounds like a campaign rally.</p></div>
     </div>
-  </section>
+  </section>`)}
+  ${shelf('All lines in this set','Open the full list for the selected grammar target.', `
   <section class="block">
     <div class="block-head"><h2 class="h3" id="setTitle"></h2><span class="mono muted" id="setCount"></span></div>
     <ul class="setlist" id="setList"></ul>
-  </section>`;
+  </section>`)}
+  </div>`;
 }
 
 function roomWrite(){
@@ -1002,17 +1069,22 @@ function roomWrite(){
   });
   const speech=(arr)=>arr.map(s=>({title:s.title,tags:['Rubio'],extra:quoteHTML(s.quote,'Rubio',s.note)+`<div class="field"><span class="lbl">What it does</span><p>${esc(s.fn)}</p></div>`}));
   return head('Writing · W3','Your best sentences are your short ones.','Your one-paragraph essays are the same habit as your spoken walls. Use Naval’s short lines and Rubio’s rhythm, and break every page into paragraphs.')+`
-  ${listSection('Ten Naval lines of 12 words or fewer','Each one is a full point. Then he explains it.',APHORISMS.map(a=>({...a,who:'Naval'})))}
-  ${listSection('Four Rubio moves','Rhythm you can steal for writing and for stories.',devItems)}
-  <section class="block">
+  <section class="next-practice" aria-labelledby="writeAction"><div><p class="eyebrow">Writing practice</p><h2 id="writeAction">One idea per paragraph</h2><p class="hint">Use the existing four-paragraph plan to start.</p></div><a class="btn primary" href="#write" data-scroll="essayPlan">Start writing ${ICON.arrow}</a></section>
+  <div class="shelves" aria-label="Writing techniques">
+  ${shelf('Short sentences · Naval','One short sentence can carry a whole point.', listSection('Ten Naval lines of 12 words or fewer','Each one is a full point. Then he explains it.',APHORISMS.map(a=>({...a,who:'Naval'}))))}
+  ${shelf('Rhythm and contrast · Rubio','Try “not X, but Y” or a short line after a long one.', listSection('Four Rubio moves','Rhythm you can steal for writing and for stories.',devItems))}
+  ${shelf('Essay plan','Good days vs. bad days, in four paragraphs.', `
+  <section class="block" id="essayPlan">
     <div class="block-head"><h2 class="h3">Essay plan: Good days vs. bad days</h2><span class="mono muted">4 paragraphs</span><p class="sub">Four separate paragraphs, short sentences, one borrowed move in each.</p></div>
     <ol class="essay">${ESSAY.map(e=>`<li><span class="nm">${esc(e.name)}</span><p class="ts">${esc(e.ts)}</p><div class="tool"><span class="lbl">${esc(e.tool)}</span><p>${esc(e.line)}</p><span>${esc(e.sup)}</span></div></li>`).join('')}</ol>
-  </section>
-  ${listSection('How Rubio opens a room','Speeches only.',speech(SPEECH_OPEN))}
-  ${listSection('How Rubio ends a speech','Speeches only. Never at the gym.',speech(SPEECH_END))}`;
+  </section>`)}
+  ${shelf('Speech openers · Rubio','Ways to open a room in a prepared speech.', listSection('How Rubio opens a room','Speeches only.',speech(SPEECH_OPEN)))}
+  ${shelf('Speech closers · Rubio','Ways to end a prepared speech.', listSection('How Rubio ends a speech','Speeches only. Never at the gym.',speech(SPEECH_END)))}
+  </div>`;
 }
 
 $('#room-today').innerHTML=roomToday();
+$('#room-speak').innerHTML=roomSpeak();
 $('#room-retry').innerHTML=roomRetry();
 $('#room-fillers').innerHTML=roomFillers();
 $('#room-talk').innerHTML=roomTalk();
@@ -1132,7 +1204,18 @@ function startLocal(){
 function renderDays(){
   const k=todayKey(),d=Store.days[k]||{},steps=stepsOf(k),busy=Store.mode==='loading'||Store.readOnly;
   SESSION.forEach((s,i)=>{const li=$('#step'+i),b=li.querySelector('.check');b.setAttribute('aria-pressed',String(!!steps[i]));li.classList.toggle('done',!!steps[i]);b.disabled=busy});
-  $('#stepCount').textContent=`${steps.filter(Boolean).length} / 5`;
+  const nDone=steps.filter(Boolean).length;
+  $('#stepCount').textContent=`${nDone} / ${SESSION.length}`;
+  const next=SESSION[steps.findIndex(x=>!x)],link=$('#nextLink'),loading=Store.mode==='loading';
+  $('#nextLabel').textContent=`Today’s session · ${nDone} of ${SESSION.length}`;
+  $('#nextName').textContent=loading?'Getting ready…':next?next.name:'Session complete';
+  $('#nextHint').textContent=loading?'':next?next.hint:'All five steps are checked off.';
+  link.hidden=loading||!next;
+  if(next){
+    link.setAttribute('href','#'+next.room);
+    if(next.scroll)link.dataset.scroll=next.scroll;else delete link.dataset.scroll;
+    link.firstChild.textContent=nDone?'Continue ':'Start ';
+  }
   const tw=$('#twentyBtn');tw.setAttribute('aria-pressed',String(!!d.twenty));tw.querySelector('span').textContent=d.twenty?'20 + 20 done today':'Mark today’s 20 + 20';tw.disabled=busy;
   let n=0;const cells=[];
   for(let i=6;i>=0;i--){const key=shiftKey(-i),x=Store.days[key]||{},full=!!x.twenty,part=!full&&Array.isArray(x.steps)&&x.steps.some(Boolean);if(full)n++;
@@ -1316,16 +1399,21 @@ document.addEventListener('click',e=>{
 });
 
 /* ================= router ================= */
-const ROOMS=['today','retry','fillers','talk','explain','story','shadow','write'];
+const ROOMS=['today','speak','retry','fillers','talk','explain','story','shadow','write'];
 let pendingScroll=null,lastRoom=null;
 function currentRoom(){const r=(location.hash||'').slice(1);return ROOMS.includes(r)?r:'today'}
 function route(){
   const r=currentRoom();
   ROOMS.forEach(k=>{$('#room-'+k).hidden=k!==r});
-  $$('#tabs a').forEach(a=>{if(a.dataset.room===r)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current')});
+  $('#speakBack').hidden=!['talk','fillers','story','explain'].includes(r);
+  const tab=['talk','fillers','story','explain'].includes(r)?'speak':r==='retry'?'today':r;
+  $$('#tabs a').forEach(a=>{if(a.dataset.room===tab)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current')});
   if(lastRoom&&lastRoom!==r&&Voice.btn)stopVoice();
   const target=pendingScroll&&document.getElementById(pendingScroll);pendingScroll=null;
-  if(target){requestAnimationFrame(()=>target.scrollIntoView({behavior:'smooth',block:'start'}))}
+  if(target){
+    for(let p=target.parentElement;p;p=p.parentElement)if(p.tagName==='DETAILS')p.open=true;
+    requestAnimationFrame(()=>target.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'}));
+  }
   else if(lastRoom!==null){window.scrollTo(0,0)}
   lastRoom=r;
 }
